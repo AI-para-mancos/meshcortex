@@ -1,0 +1,35 @@
+version = 1
+revision = 3
+requires-python = ">=3.11"
+
+[manifest]
+members = [
+    "gpu-node",
+    "meshcortex",
+    "orchestrator",
+]
+
+[[package]]
+name = "gpu-node"
+version = "0.1.0"
+source = { editable = "packages/backends/gpu-node" }
+
+[[package]]
+name = "meshcortex"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "gpu-node" },
+    { name = "orchestrator" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "gpu-node", editable = "packages/backends/gpu-node" },
+    { name = "orchestrator", editable = "packages/orchestrator" },
+]
+
+[[package]]
+name = "orchestrator"
+version = "0.1.0"
+source = { editable = "packages/orchestrator" }
