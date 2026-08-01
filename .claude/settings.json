@@ -1,0 +1,17 @@
+{
+  "$comment": "Ajustes de Claude Code compartidos por el equipo (versionados en el repo). Ver SETUP.md.",
+  "enabledMcpjsonServers": ["github"],
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(uv run:*)",
+      "Bash(python -m pytest:*)"
+    ]
+  }
+}
