@@ -1,5 +1,5 @@
 {
-  "$comment": "Ajustes de Claude Code compartidos por el equipo (versionados en el repo). Ver SETUP.md.",
+  "$comment": "Team-shared Claude Code settings (versioned in the repo).",
   "enabledMcpjsonServers": ["github"],
   "permissions": {
     "allow": [
