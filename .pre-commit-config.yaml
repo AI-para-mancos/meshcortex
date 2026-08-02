@@ -1,0 +1,14 @@
+# Pre-commit hooks: run ruff (lint + format) before each commit.
+# The ruff version here is pinned to match the `ruff` dev dependency in
+# pyproject.toml and the CI, so local hooks and CI behave identically.
+# When upgrading ruff, bump BOTH this `rev` and the pyproject pin together.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.1
+    hooks:
+      # Linter. --fix auto-fixes what it can; if it changes files the commit is
+      # blocked until you re-stage them, and unfixable issues block outright.
+      - id: ruff-check
+        args: [--fix]
+      # Formatter (reads [tool.ruff] from pyproject.toml, shared config).
+      - id: ruff-format

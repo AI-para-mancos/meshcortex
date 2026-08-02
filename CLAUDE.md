@@ -30,10 +30,16 @@ Model weights are never committed: each node downloads/caches its own weights lo
 
 ## Commands
 
-- Install/sync the whole workspace: `uv sync`
+- Install/sync the whole workspace: `uv sync` (or `uv sync --all-packages`)
 - Sanity-check the workspace wiring: `uv run python -c "import orchestrator, backends.gpu_node"`
+- Lint: `uv run ruff check .`
+- Format (in place): `uv run ruff format .` — verify only: `uv run ruff format --check .`
+- Tests: `uv run pytest packages/ -v`
 
-No lint or test tooling is configured yet in this repo — don't assume a `ruff`/`pytest` setup exists until it's added, and update this section once it is.
+Lint/format is enforced by `ruff` and runs in CI (`.github/workflows/ci.yml`) and
+via pre-commit (`.pre-commit-config.yaml`); the ruff version is pinned to the same
+value in both plus the `pyproject.toml` dev group. See `CONTRIBUTING.md` for local
+pre-commit setup. Ruff config lives in `[tool.ruff]` in `pyproject.toml`.
 
 ## Adding a new workspace package
 
