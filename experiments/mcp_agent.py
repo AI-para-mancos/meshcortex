@@ -14,7 +14,8 @@ Model-agnostic: it only talks to the OpenAI-compatible endpoint, so whatever
 model llama-server serves works. The tool decision uses a lenient JSON prompt so
 it works even with models that lack native function-calling.
 
-Requires: pip install mcp numpy requests
+Requires: pip install "mcp<2" numpy requests
+(mcp>=2.0 removed mcp.server.fastmcp/FastMCP and reworked the client API used here)
 Run (llama-server must be up on :8080):
     python experiments/mcp_agent.py
     python experiments/mcp_agent.py "cuanto es la raiz cuadrada de 144"

@@ -42,8 +42,9 @@ real MCP server.
 - `mcp_agent.py` — the host/agent again, but now it launches `mcp_server.py` as
   a subprocess, discovers its tools over MCP (`session.list_tools`), and calls
   them through MCP (`session.call_tool`) instead of a local dict.
-Requires `pip install mcp numpy requests`. Run (with `llama-server` up on
-`:8080`):
+Requires `pip install "mcp<2" numpy requests` (the 2.x line removed
+`mcp.server.fastmcp`/`FastMCP`, which these scripts use). Run (with
+`llama-server` up on `:8080`):
 
 ```bash
 python experiments/mcp_agent.py "cuanto es la raiz cuadrada de 144"

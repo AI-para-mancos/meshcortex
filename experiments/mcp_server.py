@@ -5,7 +5,8 @@ This is the TOOL side. It has no LLM and no intelligence - it just publishes a
 tool and executes it when asked, over the MCP protocol (stdio transport). The
 agent (mcp_agent.py) launches this as a subprocess and talks to it via MCP.
 
-Requires: pip install mcp numpy
+Requires: pip install "mcp<2" numpy
+(mcp>=2.0 removed mcp.server.fastmcp/FastMCP, which this script uses)
 """
 
 import numpy as np
