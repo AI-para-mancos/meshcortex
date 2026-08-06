@@ -33,24 +33,18 @@ powershell -ExecutionPolicy Bypass -File experiments\request_curl.ps1
 
 ### MCP tool-calling demo
 
-Shows the "model decides -> tool executes -> model answers" agent loop, first
-with a fake in-process tool registry, then with a real MCP server, to make clear
-that MCP only changes the transport, not the logic.
+Shows the "model decides -> tool executes -> model answers" agent loop over a
+real MCP server.
 
-- `mcp_poc.py` — the host + a local `TOOLS` dict standing in for an MCP server.
-  The model (via `llama-server`) decides whether to call the `calcular` tool;
-  this script executes it directly and feeds the result back.
-- `mcp_server.py` — a real (minimal) MCP server exposing the same `calcular`
+- `mcp_server.py` — a real (minimal) MCP server exposing the `calcular`
   tool over the MCP stdio transport. No LLM, no intelligence — it just
   publishes and executes the tool.
 - `mcp_agent.py` — the host/agent again, but now it launches `mcp_server.py` as
   a subprocess, discovers its tools over MCP (`session.list_tools`), and calls
   them through MCP (`session.call_tool`) instead of a local dict.
-
 Requires `pip install mcp numpy requests`. Run (with `llama-server` up on
 `:8080`):
 
 ```bash
-python experiments/mcp_poc.py "cuanto es la raiz cuadrada de 144"
 python experiments/mcp_agent.py "cuanto es la raiz cuadrada de 144"
 ```
