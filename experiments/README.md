@@ -42,10 +42,32 @@ real MCP server.
 - `mcp_agent.py` — the host/agent again, but now it launches `mcp_server.py` as
   a subprocess, discovers its tools over MCP (`session.list_tools`), and calls
   them through MCP (`session.call_tool`) instead of a local dict.
+- `mcp_agent_server.py` — wraps the same `mcp_agent.py` flow behind a minimal
+  `POST /ask` HTTP endpoint (`{"query": "..."}` -> `{"answer": "..."}`), so
+  remote clients (teammates) can trigger it over the network instead of
+  running the script locally. Built on Starlette + uvicorn (both already ship
+  as dependencies of `mcp`, needed by FastMCP's HTTP transports), so it adds
+  no new dependency. Optional `Authorization: Bearer` auth via the
+  `MCP_DEMO_API_KEY` env var.
+
 Requires `pip install "mcp<2" numpy requests` (the 2.x line removed
 `mcp.server.fastmcp`/`FastMCP`, which these scripts use). Run (with
 `llama-server` up on `:8080`):
 
 ```bash
 python experiments/mcp_agent.py "cuanto es la raiz cuadrada de 144"
+```
+
+To serve it over HTTP instead (no extra install needed beyond `mcp`):
+
+```powershell
+$env:MCP_DEMO_API_KEY = "changeme"
+python experiments/mcp_agent_server.py
+```
+
+```bash
+curl http://localhost:8211/ask \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer changeme" \
+  -d '{"query": "cuanto es la raiz cuadrada de 144"}'
 ```

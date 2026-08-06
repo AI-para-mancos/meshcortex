@@ -99,7 +99,7 @@ async def main(query):
             call = parse_tool_call(decision, names)
             if not call:
                 print(f"[RESPUESTA FINAL] {decision.strip()}")
-                return
+                return decision.strip()
 
             # STEP 3 - execute the tool THROUGH MCP.
             print(f"[HOST -> MCP] call_tool {call['tool']}({call.get('args', {})})")
@@ -114,6 +114,7 @@ async def main(query):
                                         "Responde al usuario en lenguaje natural."})
             final = ask_llm(messages)
             print(f"[RESPUESTA FINAL] {final.strip()}")
+            return final.strip()
 
 
 if __name__ == "__main__":
