@@ -4,9 +4,8 @@ import json
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
-
 from common.contract import ChatCompletionRequest, ChatCompletionResponse
+from pydantic import ValidationError
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -25,15 +24,15 @@ def test_response_validates_against_real_llama_cpp_capture() -> None:
 
 
 def test_response_round_trips_through_json() -> None:
-    """Validating then re-serializing must preserve the Phase 0 subset of fields."""
+    """Serializing must emit exactly the Phase 0 subset -- no backend-specific extras like
+    `timings` -- and re-validating that output must reproduce an identical model."""
     raw = json.loads((FIXTURES_DIR / "chat_completion_response.json").read_text())
 
     response = ChatCompletionResponse.model_validate(raw)
     dumped = json.loads(response.model_dump_json())
 
-    assert dumped["id"] == raw["id"]
-    assert dumped["usage"]["prompt_tokens"] == raw["usage"]["prompt_tokens"]
-    assert dumped["choices"][0]["message"]["role"] == "assistant"
+    assert set(dumped.keys()) == {"id", "model", "choices", "usage"}
+    assert ChatCompletionResponse.model_validate(dumped) == response
 
 
 def test_request_accepts_minimal_payload() -> None:
@@ -62,7 +61,7 @@ def test_request_tolerates_unknown_fields() -> None:
 
 
 def test_request_rejects_streaming() -> None:
-    """stream=true must fail validation: streaming is out of scope for Phase 0, not silently dropped."""
+    """stream=true must fail validation instead of being silently dropped."""
     with pytest.raises(ValidationError):
         ChatCompletionRequest.model_validate(
             {"model": "any", "messages": [{"role": "user", "content": "hi"}], "stream": True}

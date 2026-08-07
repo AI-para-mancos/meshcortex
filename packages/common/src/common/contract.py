@@ -49,7 +49,7 @@ class ChatCompletionRequest(ContractModel):
         default=None, description="Sampling temperature. None lets the backend decide."
     )
     stream: bool = Field(
-        default=False, description="Must be false. Streaming responses are out of scope for Phase 0."
+        default=False, description="Must be false. Streaming is out of scope for Phase 0."
     )
 
     @field_validator("stream")
@@ -84,7 +84,7 @@ class Choice(ContractModel):
 
     index: int = Field(description="Position of this choice within the choices list.")
     message: Message = Field(description="The generated assistant message.")
-    finish_reason: str | None = Field(description="Why generation stopped, e.g. 'stop' or 'length'.")
+    finish_reason: str | None = Field(description="Why generation stopped, e.g. 'stop'/'length'.")
 
 
 class ChatCompletionResponse(ContractModel):
