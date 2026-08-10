@@ -41,6 +41,14 @@ via pre-commit (`.pre-commit-config.yaml`); the ruff version is pinned to the sa
 value in both plus the `pyproject.toml` dev group. See `CONTRIBUTING.md` for local
 pre-commit setup. Ruff config lives in `[tool.ruff]` in `pyproject.toml`.
 
+Before opening a PR, run the same checks CI runs so lint/format failures are
+caught locally instead of after pushing:
+
+```
+uv run ruff check .
+uv run ruff format --check .
+```
+
 ## Adding a new workspace package
 
 A new leaf package needs all of the following, or `uv sync` will not install it:
