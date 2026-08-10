@@ -2,7 +2,7 @@
 name = "meshcortex"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["orchestrator", "gpu-node"]
+dependencies = ["orchestrator", "gpu-node", "common"]
 
 [tool.uv]
 package = false
@@ -10,9 +10,10 @@ package = false
 [tool.uv.sources]
 orchestrator = { workspace = true }
 gpu-node = { workspace = true }
+common = { workspace = true }
 
 [tool.uv.workspace]
-members = ["packages/orchestrator", "packages/backends/gpu-node"]
+members = ["packages/orchestrator", "packages/backends/gpu-node", "packages/common"]
 
 # Development/CI tooling (not shipped with the packages).
 [dependency-groups]
