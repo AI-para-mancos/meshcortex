@@ -62,7 +62,6 @@ A new leaf package needs all of the following, or `uv sync` will not install it:
 
 - All code and comments must be written in English. This covers identifiers (variables, functions, classes, modules), comments, docstrings, log/console messages, test names, and documentation. No mixed-language content.
 - Do not add links or references to GitHub issues (e.g. issue numbers, `#123`) anywhere in this repo's code, comments, or docs.
-- Do not add a `Co-Authored-By` line for Claude in commit messages.
 
 ## Local notes
 
