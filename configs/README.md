@@ -100,6 +100,16 @@ Full-GPU inference engine, CUDA-only, no CPU fallback. GGUF support is experimen
 docs call it "highly experimental and under-optimized... might be incompatible with other
 features."
 
+> **Platform:** vLLM ships **Linux-only** wheels (`manylinux`); there is no Windows
+> build. On Windows, run it inside **WSL2** (or a Linux host/container) — a native
+> `pip install vllm` on Windows only finds the source distribution and won't build
+> (`uv pip install --only-binary=:all: vllm` reports no `win_amd64` wheel).
+>
+> **VRAM:** vLLM is a full-GPU engine; for GGUF it dequantizes weights to fp16, so a
+> ~2B model needs ~4 GB for weights alone, before the KV cache — it does not fit the
+> team's ~4 GB VRAM floor. Use **llama.cpp or Ollama** on those machines, and run the
+> vLLM path on a Linux GPU node with more headroom (8 GB or more).
+
 1. Install (needs a CUDA-matching PyTorch build — see
    [vLLM's install docs](https://docs.vllm.ai/en/latest/getting_started/installation/index.html)
    for your CUDA version):
