@@ -51,3 +51,43 @@ The ruff version is pinned in **two** places that must stay in sync:
 When upgrading ruff, bump **both** together so local hooks and CI keep using an
 identical version. Ruff reads its configuration from `[tool.ruff]` in
 `pyproject.toml`, so lint/format rules are defined once and shared.
+
+## Setup
+
+### 1. Install uv
+- Windows (PowerShell):
+  `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+- macOS/Linux: see https://docs.astral.sh/uv/getting-started/installation/
+  (untested — no Mac/Linux machine on this team yet)
+
+### 2. Install git (if you don't have it)
+`winget install --id Git.Git -e --source winget`
+
+### 3. Clone the repo
+Note: clone to a local, non-synced path. Network drives and OneDrive/IT-redirected
+folders (e.g. corporate "Documents" redirection) break uv/pip installs with
+"cannot move file to different disk drive" errors.
+
+`git clone https://github.com/AI-para-mancos/meshcortex.git`
+
+`cd meshcortex` 
+
+### 4. Python version
+Minimum: 3.11 (pinned in `.python-version`). uv provisions this automatically —
+no separate Python install needed.
+
+### 5. Sync the workspace
+`uv sync --all-packages` 
+
+Note: as of this writing, `gpu-node` has zero declared dependencies (still an
+empty scaffold), so this currently succeeds without a GPU. This does not
+confirm no-GPU compatibility going forward — re-verify once real GPU
+dependencies (torch/vLLM) are added.
+
+### 6. Enable pre-commit hooks
+`uv tool install pre-commit`
+`pre-commit install`
+
+Verify it's working: change a double-quoted string to single quotes in any
+tracked .py file, `git add` it, and try to commit — it should be refused and
+the file auto-reformatted. Then `git restore <file>` to discard the test.
