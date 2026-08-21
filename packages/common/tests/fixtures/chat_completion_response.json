@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-3lrGixoa8arlIgrmb9yu29XdNYi11DSP",
+  "object": "chat.completion",
+  "created": 1786034702,
+  "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF:Q4_K_M",
+  "system_fingerprint": "b10229-c745be2a2",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Recursion is a method where a function calls itself, often with a smaller or simpler problem, until a base case is reached, at which point it can return the result."
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 24,
+    "completion_tokens": 36,
+    "total_tokens": 60,
+    "prompt_tokens_details": {
+      "cached_tokens": 23
+    }
+  },
+  "timings": {
+    "cache_n": 23,
+    "prompt_n": 1,
+    "prompt_ms": 16.079,
+    "prompt_per_token_ms": 16.079,
+    "prompt_per_second": 62.19292244542571,
+    "predicted_n": 36,
+    "predicted_ms": 554.861,
+    "predicted_per_token_ms": 15.412805555555556,
+    "predicted_per_second": 64.88111436918435
+  }
+}

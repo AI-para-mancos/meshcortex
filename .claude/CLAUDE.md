@@ -41,6 +41,14 @@ via pre-commit (`.pre-commit-config.yaml`); the ruff version is pinned to the sa
 value in both plus the `pyproject.toml` dev group. See `CONTRIBUTING.md` for local
 pre-commit setup. Ruff config lives in `[tool.ruff]` in `pyproject.toml`.
 
+Before opening a PR, run the same checks CI runs so lint/format failures are
+caught locally instead of after pushing:
+
+```
+uv run ruff check .
+uv run ruff format --check .
+```
+
 ## Adding a new workspace package
 
 A new leaf package needs all of the following, or `uv sync` will not install it:
@@ -54,7 +62,6 @@ A new leaf package needs all of the following, or `uv sync` will not install it:
 
 - All code and comments must be written in English. This covers identifiers (variables, functions, classes, modules), comments, docstrings, log/console messages, test names, and documentation. No mixed-language content.
 - Do not add links or references to GitHub issues (e.g. issue numbers, `#123`) anywhere in this repo's code, comments, or docs.
-- Do not add a `Co-Authored-By` line for Claude in commit messages.
 
 ## Local notes
 
