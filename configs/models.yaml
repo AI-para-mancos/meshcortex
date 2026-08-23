@@ -1,9 +1,9 @@
 models:
-  - name: qwen3-4b-q4
+  - name: qwen3-1.7b-q4
     family: qwen3
     quantization: Q4_K_M
-    size_b: 4.0
+    size_b: 1.7
     format: gguf
     node_types: [gpu]
-    source_url: https://huggingface.co/Qwen/Qwen3-4B-GGUF  # TODO: exact .gguf file, not repo root
-    approx_vram_gb: null   # TODO: fill in once someone actually measures it
+    source_url: https://huggingface.co/bartowski/Qwen_Qwen3-1.7B-GGUF/resolve/main/Qwen_Qwen3-1.7B-Q4_K_M.gguf
+    approx_vram_gb: 1.5860
