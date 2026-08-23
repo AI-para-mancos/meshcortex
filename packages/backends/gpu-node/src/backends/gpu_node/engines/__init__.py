@@ -7,8 +7,9 @@ kwargs matching the dests `add_arguments` registered). Adding a new engine is dr
 a module with that shape and one entry here -- `cli.py` never needs to change.
 """
 
-from backends.gpu_node.engines import llama_cpp
+from backends.gpu_node.engines import llama_cpp, ollama
 
 ENGINES = {
     "llama-cpp": llama_cpp,
+    "ollama": ollama,
 }
