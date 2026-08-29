@@ -7,6 +7,7 @@ from backends.gpu_node.engines import llama_cpp
 from model_entry_factory import make_model_entry
 
 MODEL_PATH = Path("/models/model.gguf")
+MODEL_NAME = "qwen3-1.7b-q4"
 
 
 @pytest.mark.parametrize(
@@ -18,6 +19,8 @@ MODEL_PATH = Path("/models/model.gguf")
                 "llama-server",
                 "-m",
                 str(MODEL_PATH),
+                "-a",
+                MODEL_NAME,
                 "--port",
                 "8080",
                 "-ngl",
@@ -32,6 +35,8 @@ MODEL_PATH = Path("/models/model.gguf")
                 "/opt/llama-server",
                 "-m",
                 str(MODEL_PATH),
+                "-a",
+                MODEL_NAME,
                 "--port",
                 "9000",
                 "-ngl",
@@ -44,11 +49,11 @@ MODEL_PATH = Path("/models/model.gguf")
     ids=["defaults", "overrides"],
 )
 def test_build_command(kwargs, expected):
-    assert llama_cpp.build_command(MODEL_PATH, **kwargs) == expected
+    assert llama_cpp.build_command(MODEL_PATH, MODEL_NAME, **kwargs) == expected
 
 
 def test_serve_downloads_then_runs_llama_server_and_returns_exit_code(tmp_path, monkeypatch):
-    entry = make_model_entry()
+    entry = make_model_entry(name=MODEL_NAME)
     model_path = tmp_path / "model.gguf"
 
     monkeypatch.setattr(llama_cpp, "ensure_model_downloaded", lambda passed_entry: model_path)
@@ -59,4 +64,4 @@ def test_serve_downloads_then_runs_llama_server_and_returns_exit_code(tmp_path, 
     exit_code = llama_cpp.serve(entry, port=8081)
 
     assert exit_code == 7
-    mock_run.assert_called_once_with(llama_cpp.build_command(model_path, port=8081))
+    mock_run.assert_called_once_with(llama_cpp.build_command(model_path, MODEL_NAME, port=8081))
