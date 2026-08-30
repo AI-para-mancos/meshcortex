@@ -58,6 +58,22 @@ A new leaf package needs all of the following, or `uv sync` will not install it:
 3. An entry in the root `pyproject.toml`'s `[tool.uv.workspace] members` list.
 4. An entry in the root `pyproject.toml`'s `dependencies` plus a matching `[tool.uv.sources]` line (`<name> = { workspace = true }`). Without this last step the package is a recognized workspace *member* but a plain `uv sync` will not install it into the shared `.venv` (only `uv sync --all-packages` would). Note the root `dependencies` entry still uses the distribution name (`gpu-node`), not the import path.
 
+## Decision records
+
+Decisions that shape more than one package are written as ADRs (Architecture Decision Records): short markdown files under `docs/decisions/`, one decision per file, following `docs/decisions/TEMPLATE.md`.
+
+Write one when a choice constrains another package, or when someone will ask "why was it done this way?" months from now — not for every technical choice. Number them sequentially and never reuse a number, including for one that gets superseded.
+
+Each ADR carries a `Status`:
+
+- `Proposed` — written down and safe to build against; the team hasn't confirmed it yet.
+- `Accepted` — confirmed by the team.
+- `Superseded by NNNN` — replaced. The file stays: the reasoning is the point, not the outcome.
+
+`Proposed` is what lets dependent work start before the team has met. A decision that blocks everyone until it is ratified is the failure mode this status exists to prevent — write it, mark it `Proposed`, build against it, and let the evidence that confirms or corrects it arrive in its own task.
+
+Decisions about the team rather than the system — who owns what, hardware, cadence, budget — stay in the shared planning docs, not here. An ADR explains something a reader of this repository would otherwise have to guess.
+
 ## Conventions
 
 - All code and comments must be written in English. This covers identifiers (variables, functions, classes, modules), comments, docstrings, log/console messages, test names, and documentation. No mixed-language content.
