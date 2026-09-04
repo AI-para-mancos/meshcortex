@@ -7,3 +7,11 @@ models:
     node_types: [gpu]
     source_url: https://huggingface.co/bartowski/Qwen_Qwen3-1.7B-GGUF/resolve/main/Qwen_Qwen3-1.7B-Q4_K_M.gguf
     approx_vram_gb: 1.5860
+  - name: qwen3-8b-q4
+    family: qwen3
+    quantization: Q4_K_S
+    size_b: 8
+    format: gguf
+    node_types: [gpu]
+    source_url: https://huggingface.co/bartowski/Qwen_Qwen3-8B-GGUF/resolve/main/Qwen_Qwen3-8B-Q4_K_S.gguf
+    approx_vram_gb: 4.7793
