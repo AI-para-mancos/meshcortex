@@ -80,3 +80,14 @@ async def test_forwarded_payload_matches_the_request(
     assert forwarded_body["model"] == REQUEST_PAYLOAD["model"]
     assert forwarded_body["messages"] == REQUEST_PAYLOAD["messages"]
     assert forwarded_body["stream"] is False
+
+
+async def test_unknown_model_returns_404(client: httpx.AsyncClient, backend_url: str) -> None:
+    """A model absent from the registry yields a 404 with a helpful message."""
+    response = await client.post(
+        "/v1/chat/completions",
+        json={"model": "no-such-model", "messages": [{"role": "user", "content": "hi"}]},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"error": "model 'no-such-model' not found in registry"}

@@ -1,3 +1,6 @@
+backends:
+  gpu: http://localhost:8080
+
 models:
   - name: qwen3-1.7b-q4
     family: qwen3
