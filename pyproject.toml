@@ -34,5 +34,10 @@ line-length = 100
 select = ["E", "W", "F", "I"]
 
 [tool.pytest.ini_options]
-testpaths = ["packages"]
+testpaths = ["packages", "tests"]
 asyncio_mode = "auto"
+markers = [
+    "integration: exercises a live orchestrator and backend instead of mocked ones",
+]
+# Integration tests need a running stack, so a plain `uv run pytest` skips them.
+addopts = "-m 'not integration'"
