@@ -4,6 +4,8 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, HttpUrl, ValidationError, model_validator
 
+NodeType = Literal["gpu", "edge", "router"]
+
 
 class ModelEntry(BaseModel):
     name: str
@@ -11,13 +13,14 @@ class ModelEntry(BaseModel):
     quantization: str | None
     size_b: float
     format: Literal["gguf", "safetensors", "awq", "gptq"]
-    node_types: list[Literal["gpu", "edge", "router"]]
+    node_types: list[NodeType]
     source_url: HttpUrl
     approx_vram_gb: float | None = None
 
 
 class ModelRegistry(BaseModel):
     models: list[ModelEntry]
+    backends: dict[NodeType, HttpUrl] = {}
 
     @model_validator(mode="after")
     def no_duplicate_names(self):

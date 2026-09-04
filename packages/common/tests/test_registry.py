@@ -77,3 +77,20 @@ models:
 
     with pytest.raises(ValueError, match="node_types"):
         load_registry(yaml_file)
+
+
+def test_backends_parsed(tmp_path):
+    yaml_file = tmp_path / "models.yaml"
+    yaml_file.write_text("backends:\n  gpu: http://localhost:8080\nmodels: []\n")
+
+    registry = load_registry(yaml_file)
+
+    assert str(registry.backends["gpu"]).rstrip("/") == "http://localhost:8080"
+
+
+def test_invalid_backend_node_type(tmp_path):
+    yaml_file = tmp_path / "models.yaml"
+    yaml_file.write_text("backends:\n  cpu: http://localhost:8080\nmodels: []\n")
+
+    with pytest.raises(ValueError):
+        load_registry(yaml_file)
