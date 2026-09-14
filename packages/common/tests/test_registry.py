@@ -63,6 +63,16 @@ models:
         load_registry(yaml_file)
 
 
+@pytest.mark.parametrize("name", ["auto", "AUTO", "Auto"])
+def test_reserved_model_name(tmp_path, name):
+    """`auto` is the request-side sentinel, so no catalog entry may claim it in any casing."""
+    yaml_file = tmp_path / "reserved.yaml"
+    yaml_file.write_text(VALID_YAML.replace("qwen3-4b-q4", name))
+
+    with pytest.raises(ValueError, match="reserved"):
+        load_registry(yaml_file)
+
+
 def test_invalid_node_type(tmp_path):
     yaml_file = tmp_path / "bad_node_type.yaml"
     yaml_file.write_text("""

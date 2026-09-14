@@ -9,6 +9,12 @@ what is and isn't covered.
 Streaming (`stream=true`) is explicitly out of scope for Phase 0. The
 `ChatCompletionRequest.stream` field only accepts `false`; sending `true`
 raises a validation error instead of being silently accepted and ignored.
+
+Omitting `model` and sending the reserved value `auto` are the same request:
+both let the cluster choose. The sentinel is resolved to a concrete name
+*before* any catalog lookup. Whoever chose the model owns the right to
+substitute it -- a cluster-chosen model may fall back, a caller-named one is
+served or refused but never swapped.
 """
 
 from typing import Literal
@@ -16,7 +22,16 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 Role = Literal["system", "user", "assistant"]
-"""Phase 0 role subset. `tool`/`function` roles are out of scope until MCP tool-calling lands."""
+AUTO_MODEL = "auto"
+
+
+def is_auto_selection(model: str | None) -> bool:
+    """Whether the caller left the choice of model to the cluster.
+
+    One predicate, so the omitted/sentinel equivalence cannot drift between call
+    sites.
+    """
+    return model is None or model == AUTO_MODEL
 
 
 class ContractModel(BaseModel):
@@ -40,7 +55,13 @@ class Message(ContractModel):
 class ChatCompletionRequest(ContractModel):
     """Request body for POST /v1/chat/completions (Phase 0 subset)."""
 
-    model: str = Field(description="Model identifier requested by the client.")
+    model: str | None = Field(
+        default=None,
+        description=(
+            "Model identifier requested by the client. Omit it, or send the reserved value "
+            "'auto', to let the cluster choose -- the two are equivalent."
+        ),
+    )
     messages: list[Message] = Field(description="Conversation so far, oldest message first.")
     max_tokens: int | None = Field(
         default=None, description="Upper bound on generated tokens. None lets the backend decide."
@@ -91,6 +112,25 @@ class ChatCompletionResponse(ContractModel):
     """Response body for POST /v1/chat/completions (Phase 0 subset)."""
 
     id: str = Field(description="Unique identifier for this completion.")
-    model: str = Field(description="Model that produced the completion.")
+    model: str = Field(
+        description="Concrete model that produced the completion. Never the 'auto' sentinel."
+    )
     choices: list[Choice] = Field(description="Generated choices.")
     usage: Usage = Field(description="Token accounting. Mandatory, see Usage docstring.")
+    node_id: str | None = Field(
+        default=None,
+        description=(
+            "Node that served the request. Unset when the backend reports no identity. Mirrors "
+            "the error shape, so a success can also say where it ran."
+        ),
+    )
+
+    @field_validator("model")
+    @classmethod
+    def _reject_sentinel(cls, value: str) -> str:
+        """Echoing the sentinel back would hide which model actually served."""
+        if value == AUTO_MODEL:
+            raise ValueError(
+                f"'{AUTO_MODEL}' is not a valid response model; report the model that served."
+            )
+        return value
