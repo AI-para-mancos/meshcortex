@@ -3,7 +3,7 @@
 from contextlib import asynccontextmanager
 
 import httpx
-from common.contract import ChatCompletionRequest
+from common.contract import ChatCompletionRequest, is_auto_selection
 from common.registry import load_registry
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -34,6 +34,13 @@ async def health() -> dict[str, str]:
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: ChatCompletionRequest) -> JSONResponse:
+    # The sentinel is resolved before any catalog lookup, and nothing resolves it
+    # yet. Refuse it here rather than blaming a caller who named nothing.
+    if is_auto_selection(request.model):
+        return JSONResponse(
+            status_code=503,
+            content={"error": "automatic model selection is not available yet"},
+        )
     try:
         backend_url = resolve_backend(app.state.registry, request.model)
     except ModelNotFoundError as exc:
