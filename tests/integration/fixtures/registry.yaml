@@ -1,0 +1,20 @@
+# Registry used only by the integration pipeline. It is deliberately separate from
+# configs/models.yaml so CI scaffolding stays out of the shipped model catalogue.
+#
+# The model is the smallest instruct GGUF that still produces a real completion
+# (~105 MB), because the pipeline validates the wiring, not inference quality.
+
+backends:
+  gpu: http://localhost:8080
+
+models:
+  - name: smollm2-135m-q4
+    family: smollm2
+    quantization: Q4_K_M
+    size_b: 0.135
+    format: gguf
+    # There is no CPU node type in the schema, and the pipeline exercises the GPU
+    # backend's code path -- just with every layer left on the CPU (-ngl 0).
+    node_types: [gpu]
+    source_url: https://huggingface.co/unsloth/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-Q4_K_M.gguf
+    approx_vram_gb: 0.11
