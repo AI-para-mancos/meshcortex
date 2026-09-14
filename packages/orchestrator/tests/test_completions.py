@@ -10,6 +10,7 @@ from pathlib import Path
 import httpx
 import pytest
 from common.contract import AUTO_MODEL, ChatCompletionResponse
+from orchestrator.main import app
 from respx import MockRouter
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -101,6 +102,18 @@ async def test_automatic_selection_is_refused_until_routing_lands(
 
     assert response.status_code == 503
     assert "not found in registry" not in response.json()["error"]
+
+
+async def test_model_without_a_backend_returns_503(
+    client: httpx.AsyncClient, backend_url: str
+) -> None:
+    """A catalogued model with no backend for its node type is the cluster's fault, not yours."""
+    # Restored by the next test's lifespan, which reloads the registry from disk.
+    app.state.registry.backends.clear()
+
+    response = await client.post("/v1/chat/completions", json=REQUEST_PAYLOAD)
+
+    assert response.status_code == 503
 
 
 async def test_unknown_model_returns_404(client: httpx.AsyncClient, backend_url: str) -> None:
