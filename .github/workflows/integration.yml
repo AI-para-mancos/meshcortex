@@ -14,6 +14,8 @@ concurrency:
 env:
   # Pinned: llama.cpp cuts a release per build and "latest" moves several times a day.
   LLAMA_CPP_BUILD: b10679
+  # Pinned for the same reason -- see the install.sh invocation below.
+  OLLAMA_VERSION: "0.34.0"
   REGISTRY_PATH: tests/integration/fixtures/registry.yaml
   ORCHESTRATOR_PORT: "8000"
   # Read straight from the environment by tests/integration/settings.py.
@@ -28,12 +30,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Each engine carries its own serve flags and readiness probe, so adding one
-        # is adding an entry here -- the suite itself stays engine-agnostic.
+        # Each engine carries its own serve flags, so adding one is adding an entry
+        # here -- the suite itself, and the readiness check below, stay engine-agnostic.
         include:
           - engine: llama-cpp
             serve_flags: --ngl 0
-            backend_health_url: http://localhost:8080/health
+          - engine: ollama
+            serve_flags: ""
 
     steps:
       - name: Checkout
@@ -49,6 +52,7 @@ jobs:
         run: uv sync --all-packages
 
       - name: Install llama-server (CPU-only build)
+        if: matrix.engine == 'llama-cpp'
         run: |
           archive="llama-${LLAMA_CPP_BUILD}-bin-ubuntu-x64.tar.gz"
           curl -sSfL -o "$archive" \
@@ -58,6 +62,10 @@ jobs:
           # same directory that PATH gets.
           echo "${GITHUB_WORKSPACE}/llama-${LLAMA_CPP_BUILD}" >> "$GITHUB_PATH"
           echo "LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/llama-${LLAMA_CPP_BUILD}" >> "$GITHUB_ENV"
+
+      - name: Install ollama
+        if: matrix.engine == 'ollama'
+        run: curl -fsSL https://ollama.com/install.sh | sh
 
       - name: Cache model weights
         uses: actions/cache@v4
@@ -69,9 +77,13 @@ jobs:
         run: |
           uv run gpu-node serve ${{ matrix.engine }} "$INTEGRATION_MODEL" \
             --registry "$REGISTRY_PATH" ${{ matrix.serve_flags }} > backend.log 2>&1 &
+          # /v1/models is part of the OpenAI-compatible contract both engines expose, and
+          # only lists a model once it's actually loaded -- same check for either engine.
           # Generous: a cache miss downloads the weights inside this step.
           timeout 600 bash -c \
-            'until curl -sf "${{ matrix.backend_health_url }}" > /dev/null; do sleep 2; done'
+            'until curl -s http://localhost:8080/v1/models | grep -q "$INTEGRATION_MODEL"; do
+               sleep 2
+             done'
 
       - name: Start the orchestrator
         run: |

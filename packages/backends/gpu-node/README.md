@@ -34,8 +34,10 @@ Each engine owns its own flags. See `uv run gpu-node download --help` and
 
 - **llama-cpp**: a `llama-server` binary on `PATH`. See
   [`configs/README.md`](../../../configs/README.md#llamacpp) for how to get one.
-- **ollama**: an installed and running Ollama service. See
-  [`configs/README.md`](../../../configs/README.md#ollama) for setup.
+- **ollama**: an `ollama` binary on `PATH`. `serve ollama` starts its own server on `--port`
+  (default 8080) instead of reusing any already-running background service — an existing
+  desktop-install Ollama keeps listening on port 11434, untouched. See
+  [`configs/README.md`](../../../configs/README.md#ollama) for how to install the binary.
 
 ### Download configuration
 
@@ -58,14 +60,12 @@ they always agree on where a given model's weights actually are — whichever `H
 
 ## Verifying contract compliance
 
-Not automated in CI (no GPU or engine binaries on the CI runner) — verify manually:
+Engines are exercised end-to-end by `.github/workflows/integration.yml`. To check by hand instead:
 
-1. Start the server: `uv run gpu-node serve llama-cpp <model-name>`.
+1. Start the server: `uv run gpu-node serve llama-cpp <model-name>` or
+   `uv run gpu-node serve ollama <model-name>`.
 2. Send a [request](../../../configs/README.md#running-a-registry-model-locally) to the
    printed endpoint — see step 4 there for the exact command.
 3. The response should validate against `common.contract.ChatCompletionResponse` — the same
    shape check `packages/common/tests/test_contract.py` runs against a captured llama.cpp
    fixture.
-
-> **Pending:** verifying that the response reaches this server *through* the orchestrator,
-> until the `orchestrator` package has an actual router.
