@@ -69,3 +69,19 @@ Engines are exercised end-to-end by `.github/workflows/integration.yml`. To chec
 3. The response should validate against `common.contract.ChatCompletionResponse` — the same
    shape check `packages/common/tests/test_contract.py` runs against a captured llama.cpp
    fixture.
+
+### Through the orchestrator (full chain)
+
+The orchestrator resolves a model's backend from `configs/models.yaml`'s `backends`
+map and forwards the request, so the full chain can be verified end to end:
+
+1. Serve this node on the port the registry's backend points to (e.g. `8080`):
+   `uv run gpu-node serve llama-cpp <model-name> --port 8080`.
+2. Start the orchestrator: `uv run uvicorn orchestrator.main:app --port 9000`.
+3. POST to the orchestrator with the registry model name; it routes to this node:
+
+   ```bash
+   curl http://localhost:9000/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "<model-name>", "messages": [{"role": "user", "content": "hi"}]}'
+   ```
+
+   A model absent from the registry returns `404`.
