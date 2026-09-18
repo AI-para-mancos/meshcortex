@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, HttpUrl, ValidationError, model_validator
+from pydantic import BaseModel, HttpUrl, ValidationError, field_validator, model_validator
+
+from common.contract import AUTO_MODEL
 
 NodeType = Literal["gpu", "edge", "router"]
 
@@ -16,6 +18,19 @@ class ModelEntry(BaseModel):
     node_types: list[NodeType]
     source_url: HttpUrl
     approx_vram_gb: float | None = None
+
+    @field_validator("name")
+    @classmethod
+    def no_reserved_name(cls, value: str) -> str:
+        """Reject the request-side sentinel as a catalog name.
+
+        Case-insensitive though the wire value is exact: whoever writes `AUTO`
+        expects the default behaviour, and deserves an error over a model
+        nothing ever routes to.
+        """
+        if value.casefold() == AUTO_MODEL:
+            raise ValueError(f"'{AUTO_MODEL}' is a reserved model name")
+        return value
 
 
 class ModelRegistry(BaseModel):
