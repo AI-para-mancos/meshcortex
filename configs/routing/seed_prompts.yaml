@@ -1,0 +1,262 @@
+# Seed evaluation set for the routing complexity taxonomy declared in `taxonomy.yaml`.
+#
+# The three splits are separate lists so that disjointness is structural: a prompt
+# cannot appear in two of them without being physically duplicated. `few_shot` is the
+# only pool few-shot examples may be drawn from; showing a model a prompt and then
+# scoring it on that same prompt measures recall, not classification.
+#
+# Every entry carries:
+#   id      - stable and split-prefixed, so a blind-labelling round can refer to a
+#             prompt without quoting it.
+#   prompt  - the prompt text, in Spanish, English or a mix of both.
+#   label   - one of the class names in `taxonomy.yaml`.
+#   lang    - es | en | mixed.
+#   note    - optional; written for every adversarial entry to record the trap.
+
+few_shot:
+  - id: fs-001
+    prompt: |-
+      Traduce al inglés: «El servidor no responde».
+    label: trivial
+    lang: es
+
+  - id: fs-002
+    prompt: |-
+      Is 97 a prime number? Answer yes or no.
+    label: trivial
+    lang: en
+
+  - id: fs-003
+    prompt: |-
+      Explain what a race condition is to someone who has just learned about threads.
+    label: general
+    lang: en
+
+  - id: fs-004
+    prompt: |-
+      Escribe una función en Python que reciba una lista de números y devuelva la mediana.
+    label: general
+    lang: es
+
+  - id: fs-005
+    prompt: |-
+      Tengo un servicio FastAPI que responde bien con un worker, pero con cuatro devuelve
+      a veces la respuesta de otro usuario. Explica qué puede estar pasando y cómo lo
+      confirmarías.
+    label: complex
+    lang: es
+
+  - id: fs-006
+    prompt: |-
+      Compare row-level locking and optimistic concurrency para un sistema de reservas
+      donde una doble reserva es inaceptable pero el volumen de escritura es bajo, y
+      recomienda una.
+    label: complex
+    lang: mixed
+
+typical:
+  - id: ty-001
+    prompt: |-
+      Convierte 45 grados Fahrenheit a Celsius. Solo el número.
+    label: trivial
+    lang: es
+
+  - id: ty-002
+    prompt: |-
+      Reformat this date as ISO 8601: March 4, 2026.
+    label: trivial
+    lang: en
+
+  - id: ty-003
+    prompt: |-
+      ¿Cuál es la capital de Australia?
+    label: trivial
+    lang: es
+
+  - id: ty-004
+    prompt: |-
+      Extract the email address from this line: contact Ana at ana.ruiz@example.com before Friday.
+    label: trivial
+    lang: en
+
+  - id: ty-005
+    prompt: |-
+      Traduce esto al español, una línea: "The build failed because the cache was stale."
+    label: trivial
+    lang: mixed
+
+  - id: ty-006
+    prompt: |-
+      Write a Python function that reads a YAML file and returns its top-level keys as a
+      sorted list.
+    label: general
+    lang: en
+
+  - id: ty-007
+    prompt: |-
+      Resume en tres frases qué hace un balanceador de carga y por qué se usa.
+    label: general
+    lang: es
+
+  - id: ty-008
+    prompt: |-
+      Explain the difference between a process and a thread for a junior developer.
+    label: general
+    lang: en
+
+  - id: ty-009
+    prompt: |-
+      Escribe un correo breve avisando al equipo de que el despliegue se retrasa dos días.
+    label: general
+    lang: es
+
+  - id: ty-010
+    prompt: |-
+      Explica en español qué es el garbage collection y por qué CPython usa reference
+      counting como base.
+    label: general
+    lang: mixed
+
+  - id: ty-011
+    prompt: |-
+      Our nightly job used to finish in 20 minutes and now takes four hours. Nothing in the
+      code changed, but the input grew three times. Walk me through how you would find the
+      cause.
+    label: complex
+    lang: en
+
+  - id: ty-012
+    prompt: |-
+      Diseña el esquema de una base de datos para una biblioteca que presta ejemplares
+      físicos distintos de un mismo título, y justifica cada tabla.
+    label: complex
+    lang: es
+
+  - id: ty-013
+    prompt: |-
+      Starting from 1000 users, with 10% weekly churn and 300 new users a week, does the user
+      base grow or shrink in the long run? Show the reasoning.
+    label: complex
+    lang: en
+
+  - id: ty-014
+    prompt: |-
+      Quiero hacer testeable sin red esta función, sin cambiar su firma pública y sin añadir
+      dependencias nuevas. Propón el refactor y explica cada cambio:
+
+          def fetch_price(sku):
+              data = requests.get(f"https://api.example.com/sku/{sku}").json()
+              return round(data["cents"] / 100, 2)
+    label: complex
+    lang: es
+
+  - id: ty-015
+    prompt: |-
+      Estoy decidiendo entre vLLM y llama.cpp para un nodo con 4 GB de VRAM. Compare both on
+      memory footprint, quantization support and setup cost, y dame una recomendación.
+    label: complex
+    lang: mixed
+
+adversarial:
+  - id: adv-001
+    prompt: |-
+      Estas son las últimas líneas del log de despliegue:
+
+      2026-03-04 09:12:01 INFO  starting deploy 41f2c9
+      2026-03-04 09:12:03 INFO  pulling image orchestrator:1.4.2
+      2026-03-04 09:12:44 WARN  cache layer miss, rebuilding
+      2026-03-04 09:13:10 ERROR failed to mount volume /var/models
+      2026-03-04 09:13:10 INFO  retrying 1/3
+      2026-03-04 09:13:25 ERROR failed to mount volume /var/models
+      2026-03-04 09:13:25 INFO  retrying 2/3
+      2026-03-04 09:13:41 INFO  volume mounted
+      2026-03-04 09:14:02 INFO  health check ok
+      2026-03-04 09:14:02 INFO  deploy 41f2c9 complete
+
+      Dime solo cuántas líneas contienen ERROR.
+    label: trivial
+    lang: mixed
+    note: >-
+      Long but trivial. The log body dominates the length and looks like a debugging
+      request, while the actual ask is a count over text already supplied.
+
+  - id: adv-002
+    prompt: |-
+      Hola, buenos días, espero que estés teniendo una buena semana. Perdona que te moleste
+      con algo tan pequeño, sé que seguramente tienes cosas bastante más importantes entre
+      manos y no quiero robarte tiempo. Si en algún momento tienes un hueco, y solo si no te
+      supone ninguna molestia, ¿podrías decirme cómo se dice «mesa» en inglés? Muchísimas
+      gracias de antemano, de verdad, te lo agradezco un montón.
+    label: trivial
+    lang: es
+    note: >-
+      Politeness padding. Nearly all of the length is courtesy; the ask is a single-word
+      translation.
+
+  - id: adv-003
+    prompt: |-
+      Analiza esta cadena y dime cuántos caracteres tiene: "meshcortex".
+    label: trivial
+    lang: es
+    note: >-
+      Leads with "analiza", a multi-step verb that points at `complex`, while the ask is
+      a character count.
+
+  - id: adv-004
+    prompt: |-
+      ¿Por qué el cielo es azul?
+    label: general
+    lang: es
+    note: >-
+      Carries the "por qué" reasoning connective in six words, but the answer is a
+      recalled textbook explanation rather than a derivation.
+
+  - id: adv-005
+    prompt: |-
+      In practical terms, what do I actually gain by spawning a thread instead of forking a
+      process?
+    label: general
+    lang: en
+    note: >-
+      Paraphrase of a typical-split prompt with almost no shared vocabulary, to check the
+      label survives a change of surface form.
+
+  - id: adv-006
+    prompt: |-
+      Añade un docstring a esta función explicando qué hace:
+
+          def slugify(title):
+              return "-".join(title.lower().split())
+    label: general
+    lang: es
+    note: >-
+      A code fence and a two-part structure point at `complex`, but the function is two
+      lines and the ask needs comprehension without any reasoning chain.
+
+  - id: adv-007
+    prompt: |-
+      Why is my recursive CTE returning duplicates?
+    label: complex
+    lang: en
+    note: >-
+      Short but hard. Seven words, no code and no multi-step verb, yet the answer is a
+      diagnosis across several candidate causes.
+
+  - id: adv-008
+    prompt: |-
+      ¿Es seguro usar un solo índice HNSW para 50 millones de vectores con actualizaciones
+      constantes?
+    label: complex
+    lang: es
+    note: >-
+      Phrased as a yes-or-no question, which points at `trivial`, but any answer worth
+      having has to weigh recall, memory and rebuild cost against each other.
+
+  - id: adv-009
+    prompt: |-
+      En una palabra: ¿merece la pena cuantizar a Q4 un modelo de 0.6B? Answer in one word.
+    label: complex
+    lang: mixed
+    note: >-
+      Bounded output in two languages, the strongest `trivial` signal there is, wrapped
+      around a trade-off that has to be reasoned through before the word can be chosen.

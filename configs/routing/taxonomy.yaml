@@ -1,0 +1,53 @@
+# Complexity classes the router distinguishes. The axis is the capability a prompt
+# needs, never its task type or domain.
+#
+# A class describes prompts and nothing else. What a model can handle is recorded
+# on the model itself, as a `tier` naming the hardest class it answers acceptably,
+# so nothing here has to be revised when a model is added or requantized.
+#
+# Classes are listed from least to most capable. That order is the ranking the
+# router uses, so do not reorder them.
+
+classes:
+  - name: trivial
+    definition: >-
+      Mechanical, single-step work on text the prompt already contains, or a fact
+      the model either knows outright or does not. No reasoning chain, and no
+      judgement about the answer's shape.
+    signals:
+      - Transform text that is already in the prompt: translate, reformat, fix casing, convert units.
+      - Extract a value from supplied text.
+      - The answer's length is bounded by the ask: yes or no, one word, one line, just the number.
+      - Closed factual lookup with a single accepted answer.
+    not_this_class: >-
+      If the answer still has to be composed rather than transformed or looked up,
+      it is `general`, however short the prompt is.
+
+  - name: general
+    definition: >-
+      Composed prose or code that needs ordinary fluency and common world
+      knowledge, with at most one step of reasoning. A competent answer is
+      recognisable, and being slightly off is cheap.
+    signals:
+      - Explain a widely documented concept to a stated audience.
+      - Summarise or rewrite supplied text, where the summary is a judgement rather than an extraction.
+      - Write a short, self-contained function against a clear specification.
+      - Open-ended drafting with no constraint that has to be satisfied exactly.
+    not_this_class: >-
+      If the prompt stacks constraints that all have to hold at once, or asks for a
+      conclusion that has to be argued rather than stated, it is `complex`.
+
+  - name: complex
+    definition: >-
+      Multi-step reasoning, or a conclusion that has to be derived and defended
+      rather than recalled. Also anything where a confident wrong answer costs
+      more than a refusal, since a small model fails here silently.
+    signals:
+      - Compare options and argue a trade-off, rather than list their properties.
+      - Debug, diagnose, or explain why something behaves the way it does.
+      - Design or plan something with several interacting parts.
+      - Derive a result through intermediate steps that are not in the prompt.
+      - Several constraints stacked in one ask, each of which has to hold in the answer.
+    not_this_class: >-
+      Length alone does not put a prompt here. A long paste with a mechanical ask
+      attached is `trivial`; padding and politeness are not difficulty.
