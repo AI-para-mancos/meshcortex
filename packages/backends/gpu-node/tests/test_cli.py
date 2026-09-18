@@ -40,7 +40,7 @@ def test_resolve_entry_warns_when_not_tagged_gpu(non_gpu_registry_path):
             ["--port", "9000"],
             {"port": 9000, "ngl": 99, "ctx_size": 4096, "llama_server_bin": "llama-server"},
         ),
-        ("ollama", [], {"ollama_bin": "ollama"}),
+        ("ollama", [], {"port": 8080, "ollama_bin": "ollama"}),
     ],
     ids=["llama-cpp", "ollama"],
 )

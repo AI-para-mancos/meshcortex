@@ -1,6 +1,31 @@
 # meshcortex
 Self-hosted, backend-agnostic LLM orchestrator — routes requests across GPU and edge nodes via an OpenAI-compatible API, with MCP tools and RAG built in
 
+## How it works
+
+A client sends an OpenAI-compatible chat request to the orchestrator. The orchestrator
+looks up the requested model in the shared registry (`configs/models.yaml`) to find which
+node type serves it, then forwards the request to that backend — a GPU node
+(`packages/backends/gpu-node`) or, later, an edge node — which runs the actual inference
+engine (llama.cpp, Ollama, or vLLM) and returns the OpenAI-compatible response.
+
+## Quickstart
+
+```bash
+uv sync --all-packages
+uv run gpu-node serve llama-cpp qwen3-1.7b-q4 --port 8080
+uv run uvicorn orchestrator.main:app --port 8000
+```
+
+The server port must match `configs/models.yaml`'s `backends.gpu` entry, so the
+orchestrator can find this backend.
+
+Then send a chat request to `http://localhost:8000/v1/chat/completions` with
+`{"model": "qwen3-1.7b-q4", "messages": [...]}`.
+See [`packages/backends/gpu-node/README.md`](packages/backends/gpu-node/README.md) and
+[`configs/README.md`](configs/README.md) for prerequisites (an engine binary on `PATH`) and
+engine alternatives.
+
 ## Repository structure
 
 This project is a **monorepo**: a single git repository containing multiple packages, managed as a Python workspace (uv workspaces).

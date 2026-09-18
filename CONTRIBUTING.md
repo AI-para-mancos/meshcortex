@@ -79,10 +79,11 @@ no separate Python install needed.
 ### 5. Sync the workspace
 `uv sync --all-packages` 
 
-Note: as of this writing, `gpu-node` has zero declared dependencies (still an
-empty scaffold), so this currently succeeds without a GPU. This does not
-confirm no-GPU compatibility going forward — re-verify once real GPU
-dependencies (torch/vLLM) are added.
+Note: `gpu-node`'s own declared dependencies (`huggingface_hub`, for downloading
+model weights) don't require a GPU, so this currently succeeds on any machine.
+Actually serving a model still needs a separate inference engine binary
+(`llama-server`, Ollama) installed outside the workspace — see
+[`packages/backends/gpu-node/README.md`](packages/backends/gpu-node/README.md).
 
 ### 6. Enable pre-commit hooks
 `uv tool install pre-commit`
